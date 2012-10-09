@@ -279,6 +279,11 @@ class ShopBackwardModule extends Shop
 	{
 		return _THEME_NAME_;
 	}
+
+	public function isFeatureActive()
+	{
+		return false;
+	}
 }
 
 /**
