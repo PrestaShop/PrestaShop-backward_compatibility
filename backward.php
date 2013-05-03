@@ -43,7 +43,7 @@ if (!isset($this))
 else if (isset($this->context))
 {
 	// If we are under an 1.5 version and backoffice, we have to set some backward variable
-	if (_PS_VERSION_ >= '1.5' && isset($this->context->employee->id) && $this->context->employee->id)
+	if (_PS_VERSION_ >= '1.5' && isset($this->context->employee->id) && $this->context->employee->id && isset(AdminController::$currentIndex) && !empty(AdminController::$currentIndex))
 	{
 		global $currentIndex;
 		$currentIndex = AdminController::$currentIndex;
