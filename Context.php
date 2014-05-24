@@ -35,7 +35,7 @@ if (version_compare(_PS_VERSION_, '1.4', '<'))
 	{
 		public $id = 1;
 		public $id_shop_group = 1;
-		
+
 		public function __construct()
 		{
 		}
@@ -256,8 +256,8 @@ class ShopBackwardModule extends Shop
 
 	public $id = 1;
 	public $id_shop_group = 1;
-	
-	
+
+
 	public function getContextType()
 	{
 		return ShopBackwardModule::CONTEXT_ALL;
@@ -268,7 +268,7 @@ class ShopBackwardModule extends Shop
 	{
 		return 1;
 	}
-	
+
 	/**
 	 * Get shop theme name
 	 *
@@ -292,12 +292,25 @@ class ShopBackwardModule extends Shop
 class ControllerBackwardModule
 {
 	/**
+	 * @var boolean if object currently used in backoffice or not
+	 */
+	private $in_backoffice;
+
+	public function __construct()
+	{
+		$this->in_backoffice = defined('_PS_ADMIN_DIR_') || defined('PS_ADMIN_DIR') ? true : false;
+	}
+
+	/**
 	 * @param $js_uri
 	 * @return void
 	 */
 	public function addJS($js_uri)
 	{
-		Tools::addJS($js_uri);
+		if ($this->in_backoffice)
+			echo '<script type="text/javascript" src="'.$js_uri.'"></script>';
+		else
+			Tools::addJS($js_uri);
 	}
 
 	/**
@@ -307,7 +320,10 @@ class ControllerBackwardModule
 	 */
 	public function addCSS($css_uri, $css_media_type = 'all')
 	{
-		Tools::addCSS($css_uri, $css_media_type);
+		if ($this->in_backoffice)
+			echo '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="all">';
+		else
+			Tools::addCSS($css_uri, $css_media_type);
 	}
 
 	public function addJquery()
@@ -318,6 +334,16 @@ class ControllerBackwardModule
 			$this->addJS(_PS_JS_DIR_.'jquery/jquery-1.7.2.min.js');
 	}
 
+	/**
+	 * Add JqueryUI file in to page header.
+	 *
+	 * Use it only on PS 1.4. Other version are not supported.
+	 */
+	public function addJQueryUI()
+	{
+		$this->addJS(_PS_JS_DIR_.'jquery/jquery-ui-1.8.10.custom.min.js');
+		$this->addCSS(_PS_CSS_DIR_.'jquery-ui-1.8.10.custom.css', 'all');
+	}
 }
 
 /**
@@ -326,7 +352,7 @@ class ControllerBackwardModule
  */
 class CustomerBackwardModule extends Customer
 {
-	public $logged = false; 
+	public $logged = false;
 	/**
 	 * Check customer informations and return customer validity
 	 *
