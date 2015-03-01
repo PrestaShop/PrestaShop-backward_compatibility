@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if ((bool)Configuration::get('PS_MOBILE_DEVICE'))
+if (Configuration::get('PS_MOBILE_DEVICE') !== false)
 	require_once(_PS_MODULE_DIR_ . '/mobile_theme/Mobile_Detect.php');
 
 // Retro 1.3, 'class_exists' cause problem with autoload...
@@ -175,7 +175,7 @@ class Context
 
 		$this->shop = new ShopBackwardModule();
 
-		if ((bool)Configuration::get('PS_MOBILE_DEVICE'))
+		if (Configuration::get('PS_MOBILE_DEVICE') !== false)
 			$this->mobile_detect = new Mobile_Detect();
 	}
 
@@ -210,7 +210,7 @@ class Context
 	protected function checkMobileContext()
 	{
 		return isset($_SERVER['HTTP_USER_AGENT'])
-			&& (bool)Configuration::get('PS_MOBILE_DEVICE')
+			&& Configuration::get('PS_MOBILE_DEVICE') !== false
 			&& !Context::getContext()->cookie->no_mobile;
 	}
 
