@@ -302,28 +302,32 @@ class ControllerBackwardModule
 	}
 
 	/**
-	 * @param $js_uri
-	 * @return void
+	 * Adds a javascript file to the header for PS1.4-1.6 or returns a string(html tag with script) for PS1.3 and lower
+	 *
+	 * @param string $js_uri
+	 * @return null|bool|string Return null in PS1.5-1.6 or returns bool(true) in PS1.4 or returns string(html) in PS1.3 and lower
 	 */
 	public function addJS($js_uri)
 	{
-		if ($this->in_backoffice)
-			echo '<script type="text/javascript" src="'.$js_uri.'"></script>';
+		if ($this->in_backoffice || _PS_VERSION_ < '1.4')
+			return '<script type="text/javascript" src="'.$js_uri.'"></script>';
 		else
-			Tools::addJS($js_uri);
+			return Tools::addJS($js_uri);
 	}
 
 	/**
-	 * @param $css_uri
+	 * Adds a css file to the header for PS1.4-1.6 or returns a string(html tag with link) for PS1.3 and lower
+	 * 
+	 * @param string $css_uri
 	 * @param string $css_media_type
-	 * @return void
+	 * @return null|bool|string Return null in PS1.5-1.6 or returns bool(true) in PS1.4 or returns string(html) in PS1.3 and lower
 	 */
 	public function addCSS($css_uri, $css_media_type = 'all')
 	{
-		if ($this->in_backoffice)
-			echo '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="'.$css_media_type.'">';
+		if ($this->in_backoffice || _PS_VERSION_ < '1.4')
+			return '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="'.$css_media_type.'">';
 		else
-			Tools::addCSS($css_uri, $css_media_type);
+			return Tools::addCSS($css_uri, $css_media_type);
 	}
 
 	public function addJquery()
