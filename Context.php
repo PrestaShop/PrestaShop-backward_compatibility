@@ -321,7 +321,7 @@ class ControllerBackwardModule
 	public function addCSS($css_uri, $css_media_type = 'all')
 	{
 		if ($this->in_backoffice)
-			echo '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="all">';
+			echo '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="'.$css_media_type.'">';
 		else
 			Tools::addCSS($css_uri, $css_media_type);
 	}
