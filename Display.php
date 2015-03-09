@@ -24,6 +24,14 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+// FrontController class is not exist in PS1.3 and earlier PS versions
+if (version_compare(_PS_VERSION_, '1.4', '<'))
+{
+	class FrontController
+	{
+	}
+}
+
 /**
  * Class allow to display tpl on the FO
  */

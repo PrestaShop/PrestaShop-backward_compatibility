@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if ((bool)Configuration::get('PS_MOBILE_DEVICE'))
+if (Configuration::get('PS_MOBILE_DEVICE') !== false)
 	require_once(_PS_MODULE_DIR_ . '/mobile_theme/Mobile_Detect.php');
 
 // Retro 1.3, 'class_exists' cause problem with autoload...
@@ -35,7 +35,7 @@ if (version_compare(_PS_VERSION_, '1.4', '<'))
 	{
 		public $id = 1;
 		public $id_shop_group = 1;
-		
+
 		public function __construct()
 		{
 		}
@@ -175,7 +175,7 @@ class Context
 
 		$this->shop = new ShopBackwardModule();
 
-		if ((bool)Configuration::get('PS_MOBILE_DEVICE'))
+		if (Configuration::get('PS_MOBILE_DEVICE') !== false)
 			$this->mobile_detect = new Mobile_Detect();
 	}
 
@@ -210,7 +210,7 @@ class Context
 	protected function checkMobileContext()
 	{
 		return isset($_SERVER['HTTP_USER_AGENT'])
-			&& (bool)Configuration::get('PS_MOBILE_DEVICE')
+			&& Configuration::get('PS_MOBILE_DEVICE') !== false
 			&& !Context::getContext()->cookie->no_mobile;
 	}
 
@@ -256,8 +256,8 @@ class ShopBackwardModule extends Shop
 
 	public $id = 1;
 	public $id_shop_group = 1;
-	
-	
+
+
 	public function getContextType()
 	{
 		return ShopBackwardModule::CONTEXT_ALL;
@@ -268,7 +268,7 @@ class ShopBackwardModule extends Shop
 	{
 		return 1;
 	}
-	
+
 	/**
 	 * Get shop theme name
 	 *
@@ -292,22 +292,42 @@ class ShopBackwardModule extends Shop
 class ControllerBackwardModule
 {
 	/**
-	 * @param $js_uri
-	 * @return void
+	 * @var boolean if object currently used in backoffice or not
 	 */
-	public function addJS($js_uri)
+	private $in_backoffice;
+
+	public function __construct()
 	{
-		Tools::addJS($js_uri);
+		$this->in_backoffice = defined('_PS_ADMIN_DIR_') || defined('PS_ADMIN_DIR') ? true : false;
 	}
 
 	/**
-	 * @param $css_uri
+	 * Adds a javascript file to the header for PS1.4-1.6 or returns a string(html tag with script) for PS1.3 and lower
+	 *
+	 * @param string $js_uri
+	 * @return null|bool|string Return null in PS1.5-1.6 or returns bool(true) in PS1.4 or returns string(html) in PS1.3 and lower
+	 */
+	public function addJS($js_uri)
+	{
+		if ($this->in_backoffice || _PS_VERSION_ < '1.4')
+			return '<script type="text/javascript" src="'.$js_uri.'"></script>';
+		else
+			return Tools::addJS($js_uri);
+	}
+
+	/**
+	 * Adds a css file to the header for PS1.4-1.6 or returns a string(html tag with link) for PS1.3 and lower
+	 *
+	 * @param string $css_uri
 	 * @param string $css_media_type
-	 * @return void
+	 * @return null|bool|string Return null in PS1.5-1.6 or returns bool(true) in PS1.4 or returns string(html) in PS1.3 and lower
 	 */
 	public function addCSS($css_uri, $css_media_type = 'all')
 	{
-		Tools::addCSS($css_uri, $css_media_type);
+		if ($this->in_backoffice || _PS_VERSION_ < '1.4')
+			return '<link href="'.$css_uri.'" rel="stylesheet" type="text/css" media="'.$css_media_type.'">';
+		else
+			return Tools::addCSS($css_uri, $css_media_type);
 	}
 
 	public function addJquery()
@@ -318,6 +338,16 @@ class ControllerBackwardModule
 			$this->addJS(_PS_JS_DIR_.'jquery/jquery-1.7.2.min.js');
 	}
 
+	/**
+	 * Add JqueryUI file in to page header.
+	 *
+	 * Use it only on PS 1.4. Other version are not supported.
+	 */
+	public function addJQueryUI()
+	{
+		$this->addJS(_PS_JS_DIR_.'jquery/jquery-ui-1.8.10.custom.min.js');
+		$this->addCSS(_PS_CSS_DIR_.'jquery-ui-1.8.10.custom.css', 'all');
+	}
 }
 
 /**
@@ -326,22 +356,19 @@ class ControllerBackwardModule
  */
 class CustomerBackwardModule extends Customer
 {
-	public $logged = false; 
+	public $logged = false;
+
 	/**
 	 * Check customer informations and return customer validity
 	 *
-	 * @since 1.5.0
 	 * @param boolean $with_guest
 	 * @return boolean customer validity
 	 */
 	public function isLogged($with_guest = false)
 	{
-		if (!$with_guest && $this->is_guest == 1)
-			return false;
-
-		/* Customer is valid only if it can be load and if object password is the same as database one */
-		if ($this->logged == 1 && $this->id && Validate::isUnsignedId($this->id) && Customer::checkPassword($this->id, $this->passwd))
-			return true;
-		return false;
+		if (version_compare(_PS_VERSION_, '1.5', '>='))
+			return parent::isLogged($with_guest);
+		else
+			return Context::getContext()->cookie->isLogged($with_guest);
 	}
 }
