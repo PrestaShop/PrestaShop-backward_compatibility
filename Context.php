@@ -317,7 +317,7 @@ class ControllerBackwardModule
 
 	/**
 	 * Adds a css file to the header for PS1.4-1.6 or returns a string(html tag with link) for PS1.3 and lower
-	 * 
+	 *
 	 * @param string $css_uri
 	 * @param string $css_media_type
 	 * @return null|bool|string Return null in PS1.5-1.6 or returns bool(true) in PS1.4 or returns string(html) in PS1.3 and lower
@@ -357,21 +357,18 @@ class ControllerBackwardModule
 class CustomerBackwardModule extends Customer
 {
 	public $logged = false;
+
 	/**
 	 * Check customer informations and return customer validity
 	 *
-	 * @since 1.5.0
 	 * @param boolean $with_guest
 	 * @return boolean customer validity
 	 */
 	public function isLogged($with_guest = false)
 	{
-		if (!$with_guest && $this->is_guest == 1)
-			return false;
-
-		/* Customer is valid only if it can be load and if object password is the same as database one */
-		if ($this->logged == 1 && $this->id && Validate::isUnsignedId($this->id) && Customer::checkPassword($this->id, $this->passwd))
-			return true;
-		return false;
+		if (version_compare(_PS_VERSION_, '1.5', '>='))
+			return parent::isLogged($with_guest);
+		else
+			return Context::getContext()->cookie->isLogged($with_guest);
 	}
 }
