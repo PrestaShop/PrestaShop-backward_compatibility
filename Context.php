@@ -163,6 +163,8 @@ class Context
 			$this->country = new Country((int)$cookie->id_country);
 			$this->customer = new CustomerBackwardModule((int)$cookie->id_customer);
 			$this->employee = new Employee((int)$cookie->id_employee);
+			
+			$this->customer->logged = $cookie->logged;
 		}
 		else
 		{
